@@ -1,8 +1,11 @@
 # Vidmo
 
-**Vidmo** is a platform designed to manage and host technical video demos. It combines cloud storage with an automated review and publication workflow, ensuring that every video is vetted before going public.
+**Vidmo** is a serverless **micro-platform** designed to manage and host technical video demos. It combines cloud storage with an automated review and publication workflow, ensuring that every video is vetted before going public.
 
 ![Vidmo screenshot](/assets/vidmo.png)
+
+## User Privacy
+Vidmo is **tracker-free by design**. We do not use cookies, analytics, or third-party pixels. No user behavior or personal data is collected or stored, ensuring a direct and private connection between the viewer and the content.
 
 ## Core Features
 
@@ -19,23 +22,22 @@ Security is enforced via AWS policies and path-based isolation:
 Publication is governed by an automated n8n workflow that integrates human authorization via Slack:
 1.  **Submission:** The user submits a video file, title, and description through an **n8n Form**.
 2.  **Staging:** The workflow uploads the file to the IP-restricted `/staging` path in S3.
-3.  **Slack Authorization:** A message is sent to a dedicated Slack channel with the video details. The workflow pauses at a **man-in-the-loop** stage until a reviewer clicks the "Approve" button directly within Slack.
+3.  **Slack Authorization:** A message is sent to a dedicated Slack channel. The workflow pauses at a **man-in-the-loop** stage until a reviewer approves the content directly within Slack.
 4.  **Promotion:** Upon approval, n8n moves the file from `/staging` to `/public` and creates the related HTML file.
 5.  **Cleamup:** The uploaded file is deleted from `/staging` path if the approver user clicks on "Decline" button in Slack.
+
 
 ## Technical Stack
 
 * **Infrastructure:** AWS CloudFormation (S3, CloudFront, OAC).
 * **Automation:** n8n (Self-hosted or Cloud) for form handling, Slack integration, and S3 orchestration.
 * **Interface:** Vanilla HTML5/CSS3/JS with i18n support and [Plyr.io](https://plyr.io/).
-* **AI Assistance:** The HTML template was generated with **Gemini 3 Flash**. We strictly avoid the term "vibecoded" as every line of code produced by LLMs is accurately reviewed and controlled by our senior developers before production.
+* **AI Assistance:** The HTML template was generated with **Gemini 3 Flash**. Every line of code produced by LLMs is accurately reviewed and controlled by our developers before production.
 
-## Quick Deployment
+## Deployment
 
-Deploy the AWS infrastructure immediately using the button below:
-
-[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home#/stacks/new?templateURL=https://raw.githubusercontent.com/3W-dev/vidmo/refs/heads/main/template.yaml)
-
-**Post-Deployment Setup:**
-1. Import the provided workflow JSON into your n8n instance.
-2. Configure n8n credentials for both **AWS** and **Slack**.
+To deploy the infrastructure:
+1. Download the `template.yaml` file from this repository.
+2. Deploy the stack using the [AWS CloudFormation Console](https://console.aws.amazon.com/cloudformation/home) or the **AWS CLI**.
+3. Provide the required parameters before running the stack creation.
+4. Import the workflow JSON into your n8n instance and configure your **AWS** and **Slack** credentials.
