@@ -1,11 +1,11 @@
 # Vidmo
 
-**Vidmo** is a serverless **micro-platform** designed to manage and host technical video demos. It combines cloud storage with an automated review and publication workflow, ensuring that every video is vetted before going public.
+**Vidmo** is a serverless **micro-platform** for video hosting. It combines cloud storage with an automated review and publication workflow, ensuring that every video is vetted before going public.
 
 ![Vidmo screenshot](/assets/vidmo.png)
 
 ## User Privacy
-Vidmo is **tracker-free by design**. We do not use cookies, analytics, or third-party pixels. No user behavior or personal data is collected or stored, ensuring a direct and private connection between the viewer and the content.
+Vidmo is **tracker-free by design**. We haven't included any use of cookies, analytics, or third-party pixels in the HTML template file. No user behavior or personal data is collected or stored, ensuring a direct and private connection between the viewer and the content.
 
 ## Core Features
 
@@ -24,7 +24,7 @@ Publication is governed by an automated n8n workflow that integrates human autho
 2.  **Staging:** The workflow uploads the file to the IP-restricted `/staging` path in S3.
 3.  **Slack Authorization:** A message is sent to a dedicated Slack channel. The workflow pauses at a **man-in-the-loop** stage until a reviewer approves the content directly within Slack.
 4.  **Promotion:** Upon approval, n8n moves the file from `/staging` to `/public` and creates the related HTML file.
-5.  **Cleamup:** The uploaded file is deleted from `/staging` path if the approver user clicks on "Decline" button in Slack.
+5.  **Cleanup:** The uploaded file is deleted from `/staging` path if the approver user clicks on "Decline" button in Slack.
 
 
 ## Technical Stack
