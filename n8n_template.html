@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vidmo - {{ $('On form submission').item.json.title }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --font-display: "Space Grotesk", sans-serif;
+        --font-ui: "Manrope", sans-serif;
+        --plyr-color-main: #007bff;
+        --bg-color: #f9fafb;
+        --text-main: #111827;
+        --text-muted: #6b7280;
+        --white: #ffffff;
+        --border: #e2e8f0;
+        --danger: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        font-family: var(--font-ui);
+        background-color: var(--bg-color);
+        margin: 0;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        color: var(--text-main);
+      }
+
+      header {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 2rem;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .logo {
+        font-family: var(--font-display);
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+      }
+      .logo span {
+        color: var(--plyr-color-main);
+      }
+
+      .wrapper {
+        display: flex;
+        flex: 1;
+        position: relative;
+      }
+      main {
+        flex: 1;
+        padding: 40px;
+      }
+
+      .video-content {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .video-container {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        background: #000;
+      }
+
+      .video-info {
+        margin-top: 32px;
+      }
+      .info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .video-title {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+      }
+      .video-date {
+        font-family: var(--font-ui);
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        margin-top: 8px;
+        display: block;
+        letter-spacing: 0.05em;
+      }
+      .video-description {
+        font-family: var(--font-ui);
+        font-weight: 400;
+        color: #475569;
+        line-height: 1.7;
+        margin-top: 18px;
+        font-size: 1.05rem;
+        max-width: 780px;
+      }
+
+      .btn-actions {
+        display: flex;
+        gap: 12px;
+      }
+      .icon-btn {
+        background: var(--white);
+        border: 1px solid var(--border);
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+        color: var(--text-main);
+      }
+
+      /* --- SIDEBAR --- */
+      .sidebar {
+        width: 360px;
+        background: var(--white);
+        border-left: 1px solid var(--border);
+        height: calc(100vh - 64px);
+        position: fixed;
+        right: 0;
+        top: 64px;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 24px;
+        z-index: 2000;
+      }
+      .sidebar.open {
+        transform: translateX(0);
+        box-shadow: -20px 0 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar-toggle {
+        position: absolute;
+        left: -44px;
+        top: 20px;
+        width: 44px;
+        height: 44px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-right: none;
+        border-radius: 12px 0 0 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
+        z-index: 10;
+      }
+
+      .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 15px;
+      }
+
+      .sidebar-title {
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .close-sidebar-internal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        border: none;
+        cursor: pointer;
+        color: var(--text-main);
+      }
+
+      .saved-item {
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .saved-item-info a {
+        text-decoration: none;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+      .saved-item-info span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: block;
+        margin-top: 4px;
+        font-weight: 700;
+      }
+
+      .delete-btn {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 8px;
+      }
+      .delete-btn:hover {
+        color: var(--danger);
+      }
+
+      .share-dropdown {
+        position: relative;
+      }
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 52px;
+        background: var(--white);
+        min-width: 220px;
+        box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        z-index: 500;
+        overflow: hidden;
+      }
+      .dropdown-content.show {
+        display: block;
+      }
+      .dropdown-content button,
+      .dropdown-content a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 20px;
+        width: 100%;
+        border: none;
+        background: none;
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--text-main);
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      footer {
+        padding: 4rem 2rem;
+        text-align: center;
+        border-top: 1px solid var(--border);
+        background: var(--white);
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
+      .brand-3w {
+        font-family: var(--font-display);
+        font-weight: 800;
+        border: 2.5px solid var(--text-main);
+        padding: 4px 10px;
+        border-radius: 8px;
+        margin-left: 6px;
+        color: var(--text-main);
+      }
+
+      /* FIX MOBILE */
+      @media (max-width: 768px) {
+        main {
+          padding: 20px 15px;
+        }
+        .sidebar {
+          width: 85%;
+        }
+        .sidebar-toggle {
+          left: -50px;
+          width: 50px;
+          height: 50px;
+        }
+        .info-header {
+          flex-direction: column;
+          gap: 20px;
+        }
+        .video-title {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Vid<span>mo</span></div>
+      <a
+        href="https://github.com/3W-dev/vidmo"
+        target="_blank"
+        class="icon-btn"
+        title="GitHub"
+        ><i class="fa-brands fa-github"></i
+      ></a>
+    </header>
+
+    <div class="wrapper">
+      <main id="mainContent">
+        <div class="video-content">
+          <div class="video-container">
+            <video id="player" playsinline controls>
+              <source
+                src="https://{{ $('Init').item.json.domain }}/{{ $('Init').item.json.basename }}.webm"
+                type="video/webm"
+              />
+            </video>
+          </div>
+
+          <div class="video-info">
+            <div class="info-header">
+              <div>
+                <h1 class="video-title" id="currentTitle">
+                  {{ $('On form submission').item.json.title }}
+                </h1>
+                <time id="mainDate" class="video-date"
+                  >{{ $now.toFormat('yyyy-MM-dd') }}</time
+                >
+              </div>
+              <div class="btn-actions">
+                <button class="icon-btn" id="saveBtn" onclick="toggleSave()">
+                  <i id="saveIcon" class="fa-regular fa-bookmark"></i>
+                </button>
+                <div class="share-dropdown">
+                  <button class="icon-btn" id="shareBtn">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                  </button>
+                  <div class="dropdown-content" id="shareMenu">
+                    <button onclick="copyLink()">
+                      <i class="fa-solid fa-link"></i>
+                      <span id="textCopy">Copy Link</span>
+                    </button>
+                    <a href="#" id="shareX" target="_blank"
+                      ><i class="fa-brands fa-x-twitter"></i>
+                      <span id="textX">X</span></a
+                    >
+                    <a href="#" id="shareIn" target="_blank"
+                      ><i class="fa-brands fa-linkedin"></i>
+                      <span id="textIn">LinkedIn</span></a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="video-description" id="videoDesc"></p>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i id="toggleIcon" class="fa-solid fa-list-ul"></i>
+        </button>
+
+        <div class="sidebar-header">
+          <h3 class="sidebar-title" id="sideTitle">LIBRERIA</h3>
+          <button class="close-sidebar-internal" onclick="toggleSidebar()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div
+          id="emptyMsg"
+          style="
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 700;
+          "
+        >
+          VUOTA
+        </div>
+        <div id="savedList"></div>
+      </aside>
+    </div>
+
+    <footer>
+      <span id="footMade">MADE WITH</span>
+      <i class="fa-solid fa-heart" style="color: #ef4444"></i> BY
+      <a
+        style="display: inline-block"
+        title="3W srl - Web Attitude"
+        href="https://www.3-w.it/"
+        target="_blank"
+        ><img
+          style="vertical-align: middle"
+          title="3W srl - Web Attitude"
+          src="/logo.png"
+          alt="3W srl - Web Attitude"
+          width="40"
+          height="40"
+      /></a>
+    </footer>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script>
+      const i18n = {
+        it: {
+          saveTitle: "Salva",
+          textCopy: "Copia Link",
+          textCopied: "Copiato!",
+          textX: "X",
+          textIn: "LinkedIn",
+          sideTitle: "Libreria",
+          emptyMsg: "Nessun video salvato",
+          footMade: "FATTO CON",
+          savedOn: "Salvato il",
+          videoDesc: "{{ $('On form submission').item.json.description }}",
+        },
+        en: {
+          saveTitle: "Save",
+          textCopy: "Copy Link",
+          textCopied: "Copied!",
+          textX: "X",
+          textIn: "LinkedIn",
+          sideTitle: "Library",
+          emptyMsg: "No videos saved",
+          footMade: "MADE WITH",
+          savedOn: "Saved on",
+          videoDesc: "{{ $('On form submission').item.json.description }}",
+        },
+      };
+
+      const lang = navigator.language.startsWith("it") ? "it" : "en";
+      const t = i18n[lang];
+
+      document.getElementById("saveBtn").title = t.saveTitle;
+      document.getElementById("textCopy").innerText = t.textCopy;
+      document.getElementById("sideTitle").innerText = t.sideTitle;
+      document.getElementById("emptyMsg").innerText = t.emptyMsg;
+      document.getElementById("footMade").innerText = t.footMade;
+      document.getElementById("videoDesc").innerText = t.videoDesc;
+
+      const player = new Plyr("#player");
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+      }
+
+      const shareBtn = document.getElementById("shareBtn");
+      const shareMenu = document.getElementById("shareMenu");
+      shareBtn.onclick = (e) => {
+        e.stopPropagation();
+        shareMenu.classList.toggle("show");
+      };
+      window.onclick = () => {
+        shareMenu.classList.remove("show");
+      };
+
+      function getLibrary() {
+        return JSON.parse(localStorage.getItem("vidmo_library")) || [];
+      }
+      function updateSaveIcon() {
+        const isSaved = getLibrary().some(
+          (v) => v.url === window.location.href,
+        );
+        const icon = document.getElementById("saveIcon");
+        icon.classList.replace(
+          isSaved ? "fa-regular" : "fa-solid",
+          isSaved ? "fa-solid" : "fa-regular",
+        );
+      }
+
+      function toggleSave() {
+        let lib = getLibrary();
+        const url = window.location.href;
+        const index = lib.findIndex((v) => v.url === url);
+        if (index > -1) lib.splice(index, 1);
+        else
+          lib.push({
+            title: document.getElementById("currentTitle").innerText,
+            url: url,
+            date: document.getElementById("mainDate").innerText,
+          });
+        localStorage.setItem("vidmo_library", JSON.stringify(lib));
+        updateSaveIcon();
+        renderLibrary();
+      }
+
+      function removeFromLibrary(url) {
+        let lib = getLibrary().filter((v) => v.url !== url);
+        localStorage.setItem("vidmo_library", JSON.stringify(lib));
+        updateSaveIcon();
+        renderLibrary();
+      }
+
+      function renderLibrary() {
+        const list = document.getElementById("savedList");
+        const lib = getLibrary();
+        document.getElementById("emptyMsg").style.display =
+          lib.length === 0 ? "block" : "none";
+        list.innerHTML = lib
+          .map(
+            (v) => `
+            <div class="saved-item">
+                <div class="saved-item-info">
+                    <a href="${v.url}">${v.title}</a>
+                    <span>${t.savedOn} ${v.date}</span>
+                </div>
+                <button class="delete-btn" onclick="removeFromLibrary('${v.url}')"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+        `,
+          )
+          .join("");
+      }
+
+      function copyLink() {
+        navigator.clipboard.writeText(window.location.href);
+        const btn = document.getElementById("textCopy");
+        btn.innerText = t.textCopied;
+        setTimeout(() => {
+          btn.innerText = t.textCopy;
+        }, 2000);
+      }
+
+      updateSaveIcon();
+      renderLibrary();
+    </script>
+  </body>
+</html>
